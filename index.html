@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101513">
+  <meta name="description" content="Eine kleine Überraschung wartet hinter drei kurzen Rätseln.">
+  <title>Ein kleiner Moment</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101513;
+      --panel: #171e1a;
+      --panel-soft: #1d2722;
+      --line: #34443b;
+      --text: #f1eee5;
+      --muted: #a7b3a7;
+      --accent: #c9a978;
+      --accent-light: #ead4ae;
+      --success: #a8d1ad;
+      --error: #e6a39a;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: max(28px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(30px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(201,169,120,.12), transparent 52%),
+        radial-gradient(ellipse at 100% 100%, rgba(92,126,102,.10), transparent 42%),
+        var(--bg);
+      font: 15px/1.7 var(--mono);
+    }
+    .page { width: min(100%, 680px); margin: auto; }
+    .card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(201,169,120,.26);
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(29,39,34,.97), rgba(20,27,23,.98));
+      box-shadow: 0 24px 80px rgba(0,0,0,.38), inset 0 1px rgba(255,255,255,.035);
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 9%; right: 9%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(234,212,174,.7), transparent);
+    }
+    .topline {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 17px 24px;
+      border-bottom: 1px solid rgba(201,169,120,.16);
+      color: var(--muted); font-size: 11px; letter-spacing: .13em; text-transform: uppercase;
+    }
+    .seal { display: inline-flex; align-items: center; gap: 9px; }
+    .seal::before { content: "✳"; color: var(--accent); font-size: 15px; }
+    .progress { display: flex; align-items: center; gap: 7px; }
+    .progress-label { margin-right: 5px; }
+    .dot { width: 7px; height: 7px; border: 1px solid #718076; border-radius: 50%; }
+    .dot.active { border-color: var(--accent-light); background: var(--accent-light); box-shadow: 0 0 10px rgba(234,212,174,.48); }
+    .content { padding: clamp(24px, 6vw, 42px); }
+    .eyebrow { margin: 0 0 13px; color: var(--accent); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font: 400 clamp(32px, 7vw, 48px)/1.08 var(--serif);
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+    .intro { max-width: 48ch; margin: 13px 0 0; color: var(--muted); font-size: 13px; }
+    .rule { width: 54px; height: 1px; margin: 26px 0 22px; background: var(--accent); opacity: .7; }
+    .log { display: flex; min-height: 190px; flex-direction: column; gap: 10px; }
+    .log p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .log .system { color: var(--muted); font-size: 12px; }
+    .log .prompt { color: var(--text); font: 400 19px/1.6 var(--serif); }
+    .log .you { color: var(--accent-light); }
+    .log .you::before { content: "↳ "; color: var(--accent); }
+    .log .success { color: var(--success); }
+    .log .error { color: var(--error); font-size: 13px; }
+    .log .hint { padding-left: 12px; border-left: 1px solid var(--accent); color: var(--accent-light); font-size: 13px; }
+    .log .cipher { color: var(--accent-light); font: 400 25px/1.4 var(--serif); letter-spacing: .22em; }
+    form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(201,169,120,.19); }
+    .field { display: flex; flex: 1 1 230px; align-items: center; min-width: 0; border: 1px solid #536157; border-radius: 7px; background: rgba(0,0,0,.14); }
+    .field:focus-within { border-color: var(--accent-light); box-shadow: 0 0 0 3px rgba(234,212,174,.11); }
+    .field span { padding-left: 13px; color: var(--accent); }
+    input {
+      width: 100%; min-width: 0; padding: 12px 13px;
+      border: 0; outline: 0; background: transparent; color: var(--text);
+      font: inherit; font-size: 16px; letter-spacing: .04em;
+    }
+    input::placeholder { color: #829087; }
+    button {
+      min-height: 46px; padding: 10px 16px; border: 1px solid var(--accent-light); border-radius: 7px;
+      background: var(--accent-light); color: #171813; cursor: pointer;
+      font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+      transition: background-color .18s ease, transform .18s ease, border-color .18s ease;
+    }
+    button:hover { transform: translateY(-1px); background: #f2dfbe; }
+    button.secondary { border-color: #536157; background: transparent; color: var(--text); }
+    button.secondary:hover { border-color: var(--accent-light); background: rgba(234,212,174,.06); }
+    button:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 3px; }
+    button:disabled { cursor: default; opacity: .55; transform: none; }
+    .footer { margin: 15px 0 0; color: #869187; text-align: center; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    .voucher {
+      position: relative; margin-top: 22px; padding: clamp(23px, 6vw, 36px);
+      border: 1px solid rgba(234,212,174,.7); border-radius: 10px;
+      background: linear-gradient(135deg, rgba(201,169,120,.13), rgba(201,169,120,.025));
+      animation: reveal .65s ease-out both;
+    }
+    .voucher::after { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(234,212,174,.14); border-radius: 5px; pointer-events: none; }
+    .voucher-label { color: var(--accent-light); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
+    .voucher-title { display: block; max-width: 12ch; margin: 16px 0; font: 400 clamp(36px, 9vw, 58px)/.98 var(--serif); letter-spacing: -.035em; }
+    .voucher p { margin: 8px 0; color: var(--muted); }
+    .voucher .gift { color: var(--text); font-size: 15px; }
+    .voucher .gift strong { color: var(--accent-light); font: 400 23px var(--serif); }
+    .voucher dl { display: grid; grid-template-columns: max-content 1fr; gap: 5px 16px; margin: 22px 0 0; padding-top: 16px; border-top: 1px solid rgba(201,169,120,.2); font-size: 11px; }
+    .voucher dt { color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+    .voucher dd { margin: 0; color: var(--text); }
+    [hidden] { display: none !important; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 480px) {
+      .topline { padding: 14px 17px; font-size: 9px; }
+      .content { padding: 25px 19px; }
+      form button { flex: 1; }
+      .log { min-height: 210px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card" aria-labelledby="headline">
+      <header class="topline">
+        <span class="seal" id="who">Eine persönliche Nachricht</span>
+        <span class="progress" aria-label="Fortschritt">
+          <span class="progress-label">Freigabe</span>
+          <i class="dot" id="p0" aria-hidden="true"></i><i class="dot" id="p1" aria-hidden="true"></i><i class="dot" id="p2" aria-hidden="true"></i>
+        </span>
+      </header>
+      <div class="content">
+        <p class="eyebrow">Nur für dich</p>
+        <h1 id="headline">Ein kleiner Moment.</h1>
+        <p class="intro" id="subline">Drei kleine Rätsel trennen dich von einer Nachricht. Lass dir Zeit.</p>
+        <div class="rule" aria-hidden="true"></div>
+        <div class="log" id="log" aria-live="polite" aria-relevant="additions text"></div>
+        <form id="form" autocomplete="off">
+          <label class="field" for="answer"><span aria-hidden="true">›</span><input id="answer" name="answer" placeholder="Deine Antwort" spellcheck="false" autocapitalize="characters" aria-label="Deine Antwort"></label>
+          <button type="submit" id="send">Weiter</button>
+          <button type="button" class="secondary" id="hintBtn">Hinweis</button>
+        </form>
+        <div id="reveal" hidden></div>
+      </div>
+    </section>
+    <p class="footer">Ein besonderer Gruß · Nur für dich</p>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+      const log = document.getElementById('log');
+      const input = document.getElementById('answer');
+      const form = document.getElementById('form');
+      const hintButton = document.getElementById('hintBtn');
+      const sendButton = document.getElementById('send');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let rawName = '';
+      try {
+        rawName = decodeURIComponent(location.hash.slice(1)).replace(/[-_]/g, ' ').trim().slice(0, 28);
+      } catch (_) { /* Ignore malformed optional URL fragments. */ }
+      const safeName = rawName.replace(/[<>\u0000-\u001f]/g, '');
+      const recipient = safeName ? safeName.charAt(0).toLocaleUpperCase('de-DE') + safeName.slice(1) : '';
+      document.getElementById('who').textContent = recipient ? `Eine Nachricht für ${recipient}` : 'Eine persönliche Nachricht';
+      const recipientLabel = recipient ? `Hallo ${recipient}.` : 'Hallo.';
+
+      const normalize = value => value.toLocaleLowerCase('de-DE')
+        .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+        .replace(/[^a-z0-9]/g, '');
+      const levels = [
+        {
+          intro: [['system', 'RÄTSEL 1 VON 3 · ORIENTIERUNG'], ['prompt', 'Ich habe Städte, aber keine Häuser.\nIch habe Wälder, aber keine Bäume.\nIch habe Wasser, aber keine Fische.\nOhne mich findest du dich nicht zurecht.\n\nWas bin ich?']],
+          accepts: ['karte', 'landkarte', 'map', 'stadtplan', 'strassenkarte'],
+          hints: ['Man faltet mich auf und nie wieder richtig zusammen.', 'Heute steckt sie meistens im Handy oder als Mini-Version in einer Ecke des Bildschirms.']
+        },
+        {
+          intro: [['system', 'RÄTSEL 2 VON 3 · ZEITGEFÜHL'], ['prompt', 'Eine Zahlenfolge. Das letzte Jahr fehlt:\n\n1997 · 2001 · 2002 · 2004 · 2008 · 2013 · ????']],
+          accepts: ['2026'],
+          hints: ['Es sind Jahreszahlen. Zwischen den letzten beiden liegt eine sehr, sehr lange Wartezeit.', 'Die Zahlen markieren große Veröffentlichungen derselben Reihe. Das gesuchte Jahr ist 2026.']
+        },
+        {
+          intro: [['system', 'RÄTSEL 3 VON 3 · ENTSCHLÜSSELUNG'], ['system', 'Ein letztes Fragment ist verschlüsselt:'], ['cipher', 'R K U T O J G'], ['prompt', 'Jeder Buchstabe wurde im Alphabet um gleich viele Stellen nach vorne geschoben.\nDer Schlüssel ist die Nummer des Teils, auf den du so lange gewartet hast.']],
+          accepts: ['leonida'],
+          hints: ['Der Schlüssel ist 6. Schiebe jeden Buchstaben sechs Stellen zurück: R wird zu L.', 'L · E · O · … Klingt nach einem Ort? Ist es auch.']
+        }
+      ];
+      let level = 0;
+      let hintIndex = 0;
+      let busy = false;
+
+      function addLine(kind, text) {
+        const paragraph = document.createElement('p');
+        paragraph.className = kind;
+        paragraph.textContent = text;
+        log.appendChild(paragraph);
+        paragraph.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+        return paragraph;
+      }
+      const wait = ms => new Promise(resolve => window.setTimeout(resolve, reduceMotion ? 0 : ms));
+      async function play(lines) {
+        busy = true;
+        form.setAttribute('aria-busy', 'true');
+        for (const [kind, text] of lines) {
+          addLine(kind, text);
+          await wait(340);
+        }
+        busy = false;
+        form.removeAttribute('aria-busy');
+        if (!form.hidden) input.focus({ preventScroll: true });
+      }
+      function updateProgress() {
+        for (let i = 0; i < 3; i++) document.getElementById(`p${i}`).classList.toggle('active', i < level);
+      }
+      function start() {
+        play([
+          ['system', 'Die Nachricht wird vorbereitet …'],
+          ['system', 'Alles bereit.'],
+          ['prompt', `${recipientLabel} Für dich gibt es eine kleine Überraschung. Beweise, dass du es bist.`]
+        ]).then(() => play(levels[0].intro));
+      }
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (busy || level >= levels.length) return;
+        const answer = input.value.trim();
+        if (!answer) { input.focus(); return; }
+        input.value = '';
+        addLine('you', answer.toLocaleUpperCase('de-DE'));
+        if (!levels[level].accepts.includes(normalize(answer))) {
+          const messages = ['Noch nicht ganz. Versuch es noch einmal.', 'Das war es nicht — du schaffst das.', 'Fast? Der Hinweis-Knopf hilft gern.'];
+          addLine('error', messages[Math.floor(Math.random() * messages.length)]);
+          input.focus({ preventScroll: true });
+          return;
+        }
+        level++;
+        hintIndex = 0;
+        updateProgress();
+        if (level < levels.length) {
+          await play([['success', '✓ Richtig. Ein Schritt weiter.']]);
+          await wait(220);
+          await play(levels[level].intro);
+          return;
+        }
+        await play([['success', '✓ Entschlüsselt: LEONIDA'], ['system', 'Alle Rätsel gelöst. Deine Nachricht wartet …']]);
+        await wait(450);
+        showReveal();
+      });
+
+      hintButton.addEventListener('click', () => {
+        if (busy || level >= levels.length) return;
+        const hints = levels[level].hints;
+        if (hintIndex < hints.length) addLine('hint', `Ein kleiner Hinweis: ${hints[hintIndex++]}`);
+        else addLine('system', 'Das waren alle Hinweise. Du schaffst das.');
+        input.focus({ preventScroll: true });
+      });
+
+      function showReveal() {
+        form.hidden = true;
+        document.getElementById('headline').textContent = 'Für dich.';
+        document.getElementById('subline').textContent = 'Eine kleine Überraschung — von Herzen.';
+        const reveal = document.getElementById('reveal');
+        const voucher = document.createElement('section');
+        voucher.className = 'voucher';
+        voucher.setAttribute('aria-label', 'Deine Überraschung');
+        const label = document.createElement('span');
+        label.className = 'voucher-label';
+        label.textContent = 'Ein Gutschein für dich';
+        const title = document.createElement('strong');
+        title.className = 'voucher-title';
+        title.textContent = 'Leonida wartet auf dich.';
+        const gift = document.createElement('p');
+        gift.className = 'gift';
+        gift.append('Einzulösen für: ');
+        const game = document.createElement('strong');
+        game.textContent = 'GTA VI';
+        gift.appendChild(game);
+        const note = document.createElement('p');
+        note.textContent = 'Du hast lange darauf gewartet. Jetzt ist es fast so weit.';
+        const details = document.createElement('dl');
+        const fields = [['Empfänger', recipient || 'Für dich'], ['Gültig', 'Ab sofort'], ['Von', 'Lisa']];
+        for (const [term, description] of fields) {
+          const dt = document.createElement('dt'); dt.textContent = term;
+          const dd = document.createElement('dd'); dd.textContent = description;
+          details.append(dt, dd);
+        }
+        voucher.append(label, title, gift, note, details);
+        reveal.replaceChildren(voucher);
+        reveal.hidden = false;
+        reveal.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      }
+
+      start();
+    })();
+  </script>
+</body>
+</html>
